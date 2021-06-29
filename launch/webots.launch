@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- Copyright:Tianbot Mini -->
+<!-- Author: 锡城筱凯 -->
+<!-- Date:2021-06-27  -->
+<!-- Blog：https://blog.csdn.net/xiaokai1999 -->
+<!-- Description: 启动webots的launch文件 -->
+<launch>
+  <!-- 启动webots -->
+  <arg name="no_gui" default="false," doc="Start Webots with minimal GUI"/>
+  <include file="$(find webots_ros)/launch/webots.launch">
+    <arg name="mode" value="realtime"/>
+    <arg name="no_gui" value="$(arg no_gui)"/>
+    <arg name="world" value="$(find tianbot_mini_webots)/worlds/tianbot_mini_webots.wbt"/>
+  </include>
+</launch>

@@ -1,0 +1,89 @@
+<!-- Copyright:Tianbot Mini -->
+<!-- Author: 锡城筱凯 -->
+<!-- Date:2021-06-27  -->
+<!-- Blog：https://blog.csdn.net/xiaokai1999 -->
+<!-- Description: tianbot_mini gmapping建图启动文件 -->
+<launch>
+	<!-- 迷你机器人，基础参数 -->
+	<arg name="robot_name" default="tianbot_mini" />
+	<arg name="scan_topic" default="$(arg robot_name)/LDS_01/laser_scan/layer0" />
+	<arg name="odom_topic" default="odom" />
+	<arg name="cmd_vel_topic" default="$(arg robot_name)/cmd_vel" />
+	
+	<!-- TF坐标变换，基础参数 -->
+	<arg name="laser_frame_id" default="laser" />
+	<arg name="global_frame_id" default="map" />
+	<arg name="base_frame_id" default="base_link" />
+	<arg name="odom_frame_id" default="odom" />
+	
+  <node name="tianbot_gmapping_bringup" pkg="tianbot_mini_webots" type="tianbot_gmapping_bringup"/>
+
+  <!-- 载入机器人模型 -->
+  <arg name="model" />
+  <arg name="gui" default="false" />
+  <param name="robot_description" textfile="$(find tianbot_mini_webots)/urdf/tianbot_mini_description.urdf" />
+  <param name="use_gui" value="$(arg gui)" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  
+  <!-- 打开rviz -->
+  <node name="rviz" pkg="rviz" type="rviz"  args="-d $(find tianbot_mini_webots)/rviz/tianbot_mini_gmapping.rviz"/>
+    
+  
+    <!-- Gmapping建图算法，接收传感器数据建立地图 -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
+    <param name="odom_frame" value="odom" />
+    <param name="base_frame" value="base_link" />
+    <param name="map_update_interval" value="0.75" />
+    <!-- Set maxUrange < actual maximum range of the Laser -->
+    <param name="maxRange" value="4.5" />
+    <param name="maxUrange" value="3.5" />
+    <param name="sigma" value="0.05" />
+    <param name="kernelSize" value="1" />
+    <param name="lstep" value="0.05" />
+    <param name="astep" value="0.05" />
+    <param name="iterations" value="5" />
+    <param name="lsigma" value="0.075" />
+    <param name="ogain" value="3.0" />
+    <param name="lskip" value="0" />
+    <param name="srr" value="0.01" />
+    <param name="srt" value="0.02" />
+    <param name="str" value="0.01" />
+    <param name="stt" value="0.02" />
+    <param name="linearUpdate" value="0.5" />
+    <param name="angularUpdate" value="0.157" />
+    <param name="temporalUpdate" value="-1.0" />
+    <param name="resampleThreshold" value="0.5" />
+    <param name="particles" value="50" />
+
+    <param name="xmin" value="-1.0" />
+    <param name="ymin" value="-1.0" />
+    <param name="xmax" value="1.0" />
+    <param name="ymax" value="1.0" />
+
+    <param name="delta" value="0.05" />
+    <param name="llsamplerange" value="0.01" />
+    <param name="llsamplestep" value="0.01" />
+    <param name="lasamplerange" value="0.005" />
+    <param name="lasamplestep" value="0.005" />
+    <remap from="scan" to="$(arg scan_topic)" />
+  </node>
+
+
+  <!-- move_base 导航 -->>
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find tianbot_mini_webots)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find tianbot_mini_webots)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find tianbot_mini_webots)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find tianbot_mini_webots)/config/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find tianbot_mini_webots)/config/base_local_planner_params.yaml" command="load" />
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="$(arg odom_topic)"/>
+    <remap from="scan" to="$(arg scan_topic)"/>
+
+    <param name="base_global_planner" type="string" value="navfn/NavfnROS" />
+    <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+  </node>
+
+  <node name="tianbot_2dnav_move" pkg="tianbot_mini_webots" type="tianbot_2dnav_move"/>
+</launch>
