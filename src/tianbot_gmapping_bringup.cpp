@@ -30,7 +30,7 @@ ros::NodeHandle *n;
 static int controllerCount;                     // 设置控制器数量
 static std::vector<std::string> controllerList; // 控制器列表
 
-ros::ServiceClient timeStepClient;              // 时钟通讯客户端
+ros::ServiceClient timeStepClient;              // 时钟通讯service客户端
 webots_ros::set_int timeStepSrv;                // 时钟服务数据
 
 double GPSvalues[2];                            // GPS数据列表
@@ -43,12 +43,10 @@ double Inertialvalues[4];                       // IMU数据列表
         @name   控制器名
 * Return        ：无
 **********************************************************/
-// catch names of the controllers availables on ROS network
 void controllerNameCallback(const std_msgs::String::ConstPtr &name) { 
     controllerCount++; 
     controllerList.push_back(name->data);//将控制器名加入到列表中
     ROS_INFO("Controller #%d: %s.", controllerCount, controllerList.back().c_str());
-
 }
 
 /*******************************************************
@@ -68,40 +66,38 @@ void quit(int sig) {
 /*******************************************************
 * Function name ：broadcastTransform
 * Description   ：TF坐标转换函数
-* Parameter     ：
+* Parameter     ：无
 * Return        ：无
 **********************************************************/
-void broadcastTransform()
-{
+void broadcastTransform(){
     static tf::TransformBroadcaster br;
     tf::Transform transform;
-    transform.setOrigin(tf::Vector3(GPSvalues[0],GPSvalues[1],0));
-    tf::Quaternion q(Inertialvalues[0],Inertialvalues[2],Inertialvalues[1],-Inertialvalues[3]);
-    transform.setRotation(q);
-    br.sendTransform(tf::StampedTransform(transform,ros::Time::now(),"odom","base_link"));
+    transform.setOrigin(tf::Vector3(GPSvalues[0],GPSvalues[1],0));// 设置原点
+    tf::Quaternion q(Inertialvalues[0],Inertialvalues[2],Inertialvalues[1],-Inertialvalues[3]);// 设置四元数
+    transform.setRotation(q);// 设置旋转值
+    br.sendTransform(tf::StampedTransform(transform,ros::Time::now(),"odom","base_link"));// 发布base_link相对于odom的坐标系关系
     transform.setIdentity();
-    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "tianbot_mini/LDS_01"));
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "tianbot_mini/LDS_01"));// 发布tianbot_mini/LDS_01相对于base_link的坐标系关系
 }
 
 /*******************************************************
 * Function name ：InertialUnitCallback
 * Description   ：IMU数据回调函数
-* Parameter     ：
+* Parameter     ：无
 * Return        ：无
 **********************************************************/
-void InertialUnitCallback(const sensor_msgs::Imu::ConstPtr &value)
-{
-    
+void InertialUnitCallback(const sensor_msgs::Imu::ConstPtr &value){
     Inertialvalues[0] = value->orientation.x;
     Inertialvalues[1] = value->orientation.y;
     Inertialvalues[2] = value->orientation.z;
     Inertialvalues[3] = value->orientation.w;
     broadcastTransform();
 }
+
 /*******************************************************
 * Function name ：GPSCallback
 * Description   ：GPS数据回调函数
-* Parameter     ：
+* Parameter     ：无
 * Return        ：无
 **********************************************************/
 void GPSCallback(const geometry_msgs::PointStamped::ConstPtr &value)
@@ -183,7 +179,7 @@ int main(int argc,char **argv)
         return 1;
     }
 
-    // enable inertial unit
+    // 使能IMU传感器
     ros::ServiceClient set_inertial_unit_client;
     webots_ros::set_int inertial_unit_srv;
     ros::Subscriber sub_inertial_unit;
@@ -205,11 +201,10 @@ int main(int argc,char **argv)
             "scan:=/tianbot_mini/LDS_01/laser_scan/layer0 _xmax:=30 _xmin:=-30 _ymax:=30 _ymin:=-30 _delta:=0.2'.");
     ROS_INFO("You can now visualize the sensors output in rqt using 'rqt'.");
 
-    // main loop
     while (ros::ok()) {
         if (!timeStepClient.call(timeStepSrv) || !timeStepSrv.response.success) {
-        ROS_ERROR("Failed to call service time_step for next step.");
-        break;
+            ROS_ERROR("Failed to call service time_step for next step.");
+            break;
         }
         ros::spinOnce();
     }

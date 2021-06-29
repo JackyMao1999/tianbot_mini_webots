@@ -16,6 +16,7 @@
 	<arg name="base_frame_id" default="base_link" />
 	<arg name="odom_frame_id" default="odom" />
 	
+  <!-- 使能机器人的基本模块 -->
   <node name="tianbot_gmapping_bringup" pkg="tianbot_mini_webots" type="tianbot_gmapping_bringup"/>
 
   <!-- 载入机器人模型 -->
@@ -84,6 +85,6 @@
     <param name="base_global_planner" type="string" value="navfn/NavfnROS" />
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
   </node>
-
-  <node name="tianbot_2dnav_move" pkg="tianbot_mini_webots" type="tianbot_2dnav_move"/>
+  <!-- 机器人导航控制文件 -->
+  <!-- <node name="tianbot_2dnav_move" pkg="tianbot_mini_webots" type="tianbot_2dnav_move"/> -->
 </launch>

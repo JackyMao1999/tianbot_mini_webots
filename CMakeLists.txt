@@ -162,9 +162,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(velocity src/velocity.cpp)
-add_dependencies(velocity webots_ros_generate_messages_cpp)
-target_link_libraries(velocity	${catkin_LIBRARIES})
+add_executable(tianbot_velocity src/tianbot_velocity.cpp)
+add_dependencies(tianbot_velocity webots_ros_generate_messages_cpp)
+target_link_libraries(tianbot_velocity	${catkin_LIBRARIES})
 
 
 add_executable(tianbot_gmapping_bringup src/tianbot_gmapping_bringup.cpp)
