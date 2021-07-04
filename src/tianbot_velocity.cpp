@@ -38,7 +38,6 @@ ros::Publisher pub_speed;                   // ‘/vel’ 话题发布
 
 double speeds[NMOTORS]={0.0,0.0};           // 四电机速度值 0～100
 float linear_temp=0, angular_temp=0;        // 暂存的线速度和角速度
-float L = 0.06;                             // 两轮之间的距离
 static const char *motorNames[NMOTORS] ={"left_motor", "right_motor"}; // 匹配电机名
 
 /*******************************************************
@@ -49,6 +48,7 @@ static const char *motorNames[NMOTORS] ={"left_motor", "right_motor"}; // 匹配
 **********************************************************/
 void updateSpeed() {   
     nav_msgs::Odometry speed_data;
+    float L = 0.6;                          // 两轮之间的距离
     // 根据双轮差动底盘算法计算
     // v(linear_temp)为底盘中心线速度；w(angular_temp)为底盘中心角速度
     // Vl(speeds[0]),Vr(speeds[1])为左右两轮的速度

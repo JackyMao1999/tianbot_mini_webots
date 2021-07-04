@@ -29,9 +29,8 @@
   
   <!-- 打开rviz -->
   <node name="rviz" pkg="rviz" type="rviz"  args="-d $(find tianbot_mini_webots)/rviz/tianbot_mini_gmapping.rviz"/>
-    
   
-    <!-- Gmapping建图算法，接收传感器数据建立地图 -->
+  <!-- Gmapping建图算法，接收传感器数据建立地图 -->
   <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
     <param name="odom_frame" value="odom" />
     <param name="base_frame" value="base_link" />

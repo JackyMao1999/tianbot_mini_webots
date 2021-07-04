@@ -18,7 +18,7 @@ using namespace std;
 #define TIME_STEP 32                // 时钟
 #define NMOTORS 2                   // 电机数量
 #define MAX_SPEED 2.0               // 电机最大速度
-#define ROBOT_NAME "tianbot_mini"   // ROBOT名称
+#define ROBOT_NAME "tianbot_mini/"   // ROBOT名称
 
 ros::NodeHandle *n;
 
@@ -36,7 +36,7 @@ webots_ros::set_float set_position_srv;     // 电机位置服务数据
 
 double speeds[NMOTORS]={0.0,0.0};// 四电机速度值 0～10
 
-static const char *motorNames[NMOTORS] ={"left_motor", "right_motor"};// 控制位置电机
+static const char *motorNames[NMOTORS] ={"left_motor", "right_motor"};// 控制位置电机名称
 
 /*******************************************************
 * Function name ：updateSpeed
@@ -92,10 +92,10 @@ void quit(int sig) {
 void cmdvelDataCallback(const geometry_msgs::Twist::ConstPtr &value)
 {
     float linear_temp=0, angular_temp=0;//暂存的线速度和角速度,
-    float L = 0.06;//两轮之间的距离
+    float L = 0.6;//两轮之间的距离
     angular_temp = value->angular.z ;//获取/cmd_vel的角速度,rad/s
     linear_temp = value->linear.x ;//获取/cmd_vel的线速度.m/s
-    //将转换好的小车速度分量为左右轮速度
+    // 将转换好的小车速度分量为左右轮速度
     // 根据双轮差动底盘算法计算
     // v(linear_temp)为底盘中心线速度；w(angular_temp)为底盘中心角速度
     // Vl(speeds[0]),Vr(speeds[1])为左右两轮的速度
@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
     }   
 
     ros::Subscriber cmdvelSub;
-    cmdvelSub = n->subscribe(string(ROBOT_NAME)+"/cmd_vel",1,cmdvelDataCallback);
+    cmdvelSub = n->subscribe(string(ROBOT_NAME)+"/cmd_vel",1,cmdvelDataCallback);// 监听/cmd_vel，获取导航算法发过来的数据
     while (cmdvelSub.getNumPublishers() == 0) {}
     while (ros::ok()) {   
         ros::spinOnce();

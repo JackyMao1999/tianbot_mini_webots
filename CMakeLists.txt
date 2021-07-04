@@ -4,6 +4,9 @@ project(tianbot_mini_webots)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+# 调用OpenCV配置:C++版本为11
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -15,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   tf
 )
+find_package(OpenCV 4.2 REQUIRED) # 找OpenCV 4.2 安装路径
 
 
 
@@ -160,12 +164,12 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS} # 加载OpenCV 4.2 安装路径
 )
 
 add_executable(tianbot_velocity src/tianbot_velocity.cpp)
 add_dependencies(tianbot_velocity webots_ros_generate_messages_cpp)
 target_link_libraries(tianbot_velocity	${catkin_LIBRARIES})
-
 
 add_executable(tianbot_gmapping_bringup src/tianbot_gmapping_bringup.cpp)
 add_dependencies(tianbot_gmapping_bringup webots_ros_generate_messages_cpp)
@@ -174,3 +178,8 @@ target_link_libraries(tianbot_gmapping_bringup	${catkin_LIBRARIES})
 add_executable(tianbot_2dnav_move src/tianbot_2dnav_move.cpp)
 add_dependencies(tianbot_2dnav_move webots_ros_generate_messages_cpp)
 target_link_libraries(tianbot_2dnav_move	${catkin_LIBRARIES})
+
+add_executable(tianbot_line_follow src/tianbot_line_follow.cpp)
+add_dependencies(tianbot_line_follow webots_ros_generate_messages_cpp)
+target_link_libraries(tianbot_line_follow	${catkin_LIBRARIES})
+target_link_libraries(tianbot_line_follow	${OpenCV_LIBS})
